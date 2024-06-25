@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domovská stránka</title>
+    <link rel="stylesheet" href="styles.css" id="theme-style">
+    <style>
+        /* Stylování pro domovskou stránku */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            background-color: #003366;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .datetime {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .datetime span {
+            font-size: 1.2em;
+        }
+
+        #theme-toggle {
+            background-color: #002040;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #theme-toggle:hover {
+            background-color: #001530;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: 1200px;
+            margin: 200px;
+            
+        }
+
+        .tile {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 10px;
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+        }
+
+        .tile h2 {
+            font-size: 2em;
+            color: #003757;
+            margin-bottom: 20px;
+        }
+
+        .add-tile-btn {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .add-tile-btn:hover {
+            background-color: #002040;
+        }
+
+        .add-tile-form {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group button {
+            padding: 8px 16px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .form-group button:hover {
+            background-color: #002040;
+        }
+
+        .custom-tiles-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 20px;
+        }
+
+        .custom-tile {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            min-width: 200px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .custom-tile:hover {
+            transform: translateY(-5px);
+        }
+
+        .custom-tile h2 {
+            font-size: 1.5em;
+            color: #003757;
+            margin-bottom: 10px;
+        }
+
+        /* Kontextové menu */
+        .context-menu {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .context-menu__item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .context-menu__item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="container">
+        <div class="tile" onclick="openPage('money.html')">
+            <h2>Pokladna</h2>
+            <img src="cash-register-icon.png" alt="Pokladna">
+        </div>
+        <div class="tile" onclick="openPage('history.html')">
+            <h2>Historie</h2>
+            <img src="history-icon.png" alt="Historie">
+        </div>
+        <div class="tile" onclick="openPage('notes.html')">
+            <h2>Poznámky</h2>
+            <img src="notes-icon.png" alt="Poznámky">
+        </div>
+        <div class="tile" onclick="openPage('calendar.html')">
+            <h2>Kalendář</h2>
+            <img src="cash-register-icon.png" alt="Pokladna">
+        </div>
+        <div class="tile" onclick="openPage('table.html')">
+            <h2>Tabulka</h2>
+            <img src="cash-register-icon.png" alt="tabulka">
+        </div>
+    </div>
+
+    <!-- Button to Add Custom Tile -->
+    <div class="add-tile-btn" onclick="toggleAddTileForm()">PŘIDAT</div>
+
+    <!-- Form to Add Custom Tile (Initially Hidden) -->
+    <div class="add-tile-form" id="addTileForm">
+        <h2>Vytvořit novou dlaždici</h2>
+        <form onsubmit="createCustomTile(); return false;">
+            <div class="form-group">
+                <label for="tileName">Název dlaždice:</label>
+                <input type="text" id="tileName">
+            </div>
+            <div class="form-group">
+                <label for="tileLink">URL odkaz:</label>
+                <input type="url" id="tileLink">
+            </div>
+            <div class="form-group">
+                <label for="tileFile">Soubor z počítače:</label>
+                <input type="file" id="tileFile">
+            </div>
+            <button type="submit">Vytvořit položku</button>
+        </form>
+    </div>
+
+    <div class="custom-tiles-container" id="customTilesContainer">
+        <!-- Custom Tiles will be dynamically added here -->
+    </div>
+
+    <script>
+        // Načtení uložených dlaždic z localStorage po načtení stránky
+        window.onload = function() {
+            var storedTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+            var tilesContainer = document.getElementById('customTilesContainer');
+
+            storedTiles.forEach(function(tile, index) {
+                addCustomTileElement(tile, index);
+            });
+        };
+
+        // Funkce pro otevření/zavření formuláře pro přidání dlaždice
+        function toggleAddTileForm() {
+            var form = document.getElementById('addTileForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Funkce pro vytvoření nové vlastní dlaždice
+        function createCustomTile() {
+            var tileName = document.getElementById('tileName').value;
+            var tileLink = document.getElementById('tileLink').value;
+            var tileFile = document.getElementById('tileFile').files[0];
+
+            var newTile = { name: tileName };
+
+            if (tileLink) {
+                newTile.link = tileLink;
+            }
+
+            if (tileFile) {
+                newTile.file = tileFile.name;
+                saveFile(tileFile);
+            }
+
+            var storedTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+            storedTiles.push(newTile);
+            localStorage.setItem('customTiles', JSON.stringify(storedTiles));
+
+            addCustomTileElement(newTile, storedTiles.length - 1);
+
+            document.getElementById('tileName').value = '';
+            document.getElementById('tileLink').value = '';
+            document.getElementById('tileFile').value = '';
+            document.getElementById('addTileForm').style.display = 'none';
+        }
+
+        // Funkce pro přidání vlastního dlaždice na stránku
+        function addCustomTileElement(tile, index) {
+            var tileContainer = document.getElementById('customTilesContainer');
+            var tileElement = document.createElement('div');
+            tileElement.classList.add('custom-tile');
+            tileElement.dataset.index = index;
+            tileElement.innerHTML = `<h2>${tile.name}</h2>`;
+
+            if (tile.file) {
+                tileElement.innerHTML += `<button onclick="openFile('${tile.file}')">Otevřít soubor</button>`;
+            } else if (tile.link) {
+                tileElement.onclick = function() {
+                    openPage(tile.link);
+                };
+            }
+
+            tileElement.oncontextmenu = function(event) {
+                event.preventDefault();
+                showContextMenu(event, tileElement);
+            };
+
+            tileContainer.appendChild(tileElement);
+        }
+
+        // Funkce pro otevření stránky
+        function openPage(url) {
+            window.location.href = url;
+        }
+
+        // Funkce pro otevření souboru
+        function openFile(filename) {
+            alert(`Otevírám soubor: ${filename}`);
+        }
+
+        // Funkce pro uložení souboru
+        function saveFile(file) {
+            alert(`Ukládám soubor: ${file.name}`);
+        }
+
+        // Funkce pro zobrazení kontextového menu
+        function showContextMenu(event, tileElement) {
+            // Skrytí případného existujícího kontextového menu
+            var existingMenu = document.querySelector('.context-menu');
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+
+            // Vytvoření nového kontextového menu
+            var contextMenu = document.createElement('div');
+            contextMenu.classList.add('context-menu');
+            contextMenu.style.top = `${event.clientY}px`;
+            contextMenu.style.left = `${event.clientX}px`;
+
+            // Přidání možností do kontextového menu
+            var deleteOption = document.createElement('div');
+            deleteOption.classList.add('context-menu__item');
+            deleteOption.textContent = 'Odstranit';
+            deleteOption.onclick = function() {
+                deleteTile(tileElement);
+            };
+            contextMenu.appendChild(deleteOption);
+
+            var editOption = document.createElement('div');
+            editOption.classList.add('context-menu__item');
+            editOption.textContent = 'Upravit';
+            editOption.onclick = function() {
+                editTile(tileElement);
+            };
+            contextMenu.appendChild(editOption);
+
+            document.body.appendChild(contextMenu);
+
+            // Skrývání kontextového menu při kliknutí mimo něj
+            document.addEventListener('click', function hideContextMenu(event) {
+                if (!contextMenu.contains(event.target)) {
+                    contextMenu.remove();
+                    document.removeEventListener('click', hideContextMenu);
+                }
+            });
+
+            // Zobrazit kontextové menu
+            contextMenu.style.display = 'block';
+        }
+
+        // Funkce pro odstranění dlaždice
+        function deleteTile(tileElement) {
+            var index = tileElement.dataset.index;
+            var storedTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+            storedTiles.splice(index, 1);
+            localStorage.setItem('customTiles', JSON.stringify(storedTiles));
+            tileElement.remove();
+        }
+
+        // Funkce pro úpravu dlaždice
+        function editTile(tileElement) {
+            var index = tileElement.dataset.index;
+            var storedTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+            var tile = storedTiles[index];
+
+            // Předvyplnění formuláře existujícími údaji
+            document.getElementById('tileName').value = tile.name;
+            document.getElementById('tileLink').value = tile.link || '';
+            document.getElementById('tileFile').value = '';
+
+            // Aktualizace dlaždice po úpravě
+            document.getElementById('addTileForm').style.display = 'block';
+            document.getElementById('addTileForm').onsubmit = function() {
+                tile.name = document.getElementById('tileName').value;
+                tile.link = document.getElementById('tileLink').value;
+
+                if (document.getElementById('tileFile').files[0]) {
+                    tile.file = document.getElementById('tileFile').files[0].name;
+                    saveFile(document.getElementById('tileFile').files[0]);
+                }
+
+                storedTiles[index] = tile;
+                localStorage.setItem('customTiles', JSON.stringify(storedTiles));
+
+                tileElement.innerHTML = `<h2>${tile.name}</h2>`;
+                if (tile.file) {
+                    tileElement.innerHTML += `<button onclick="openFile('${tile.file}')">Otevřít soubor</button>`;
+                } else if (tile.link) {
+                    tileElement.onclick = function() {
+                        openPage(tile.link);
+                    };
+                }
+
+                document.getElementById('addTileForm').style.display = 'none';
+                return false;
+            };
+        }
+
+        // Aktuální datum a čas
+        setInterval(function() {
+            var now = new Date();
+            var dateTimeString = now.toLocaleDateString('cs-CZ') + ' ' + now.toLocaleTimeString('cs-CZ');
+            document.getElementById('currentDateTime').textContent = dateTimeString;
+        }, 1000);
+        
+    </script>
+</body>
+</html>
