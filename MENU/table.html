@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexibilní tabulka s persistencí</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #003366;
+        }
+
+        #tableContainer {
+            width: 100%;
+            max-width: 1000px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #003366;
+            color: white;
+        }
+
+        td input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            box-sizing: border-box;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-container button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-container button:hover {
+            background-color: #002040;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flexibilní tabulka s persistencí</h1>
+
+    <div id="tableContainer">
+        <table id="dynamicTable">
+            <thead>
+                <tr id="headerRow">
+                    <th>#</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Dynamické generování obsahu tabulky -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-container">
+        <button onclick="addColumn()">Přidat sloupec</button>
+        <button onclick="removeColumn()">Odstranit sloupec</button>
+        <button onclick="addLabel()">Přidat popisek</button>
+        <button onclick="removeLabel()">Odstranit popisek</button>
+        <button onclick="saveTable()">Uložit tabulku</button>
+        <button onclick="clearStorage()">Smazat uložená data</button>
+    </div>
+
+    <script>
+        var headerRow = document.getElementById('headerRow');
+        var tableBody = document.getElementById('tableBody');
+
+        // Načtení uložených dat po načtení stránky
+        window.onload = function() {
+            loadTable();
+        };
+
+        function loadTable() {
+            var savedTable = JSON.parse(localStorage.getItem('flexibleTable')) || { headers: [], labels: [], data: [] };
+
+            // Načtení hlaviček
+            savedTable.headers.forEach(function(headerText) {
+                var newHeaderCell = document.createElement('th');
+                newHeaderCell.textContent = headerText;
+                headerRow.appendChild(newHeaderCell);
+            });
+
+            // Načtení popisků
+            savedTable.labels.forEach(function(labelText) {
+                var newRow = tableBody.insertRow(-1);
+                var newCell = newRow.insertCell(-1);
+                newCell.innerHTML = `<input type="text" value="${labelText}">`;
+
+                // Přidání prázdné buňky pro každý existující sloupec
+                var columnCount = headerRow.cells.length;
+                for (var i = 1; i < columnCount; i++) {
+                    var emptyCell = newRow.insertCell(-1);
+                    var dataIndex = i - 1;
+                    emptyCell.innerHTML = `<input type="text" value="${savedTable.data[dataIndex] ? savedTable.data[dataIndex][savedTable.labels.indexOf(labelText)] : ''}">`;
+                }
+            });
+        }
+
+        function addColumn() {
+            var columnCount = headerRow.cells.length;
+            var newHeaderCell = document.createElement('th');
+            newHeaderCell.textContent = `Sloupec ${columnCount + 1}`;
+            headerRow.appendChild(newHeaderCell);
+
+            // Přidání nového sloupce do každého řádku
+            var rows = tableBody.rows;
+            for (var i = 0; i < rows.length; i++) {
+                var newRowCell = rows[i].insertCell(-1);
+                newRowCell.innerHTML = `<input type="text" value="">`;
+            }
+        }
+
+        function removeColumn() {
+            if (headerRow.cells.length > 1) {
+                headerRow.deleteCell(-1);
+
+                var rows = tableBody.rows;
+                for (var i = 0; i < rows.length; i++) {
+                    rows[i].deleteCell(-1);
+                }
+            }
+        }
+
+        function addLabel() {
+            var rowCount = tableBody.rows.length;
+            var newRow = tableBody.insertRow(-1);
+
+            var newCell = newRow.insertCell(-1);
+            newCell.innerHTML = `<input type="text" placeholder="Popis">`;
+
+            // Přidání prázdné buňky pro každý existující sloupec
+            var columnCount = headerRow.cells.length;
+            for (var i = 1; i < columnCount; i++) {
+                var emptyCell = newRow.insertCell(-1);
+                emptyCell.innerHTML = `<input type="text" value="">`;
+            }
+        }
+
+        function removeLabel() {
+            if (tableBody.rows.length > 1) {
+                tableBody.deleteRow(-1);
+            }
+        }
+
+        function saveTable() {
+            var headers = [];
+            var labels = [];
+            var data = [];
+
+            // Uložení hlaviček
+            var headerCells = headerRow.cells;
+            for (var i = 0; i < headerCells.length; i++) {
+                headers.push(headerCells[i].textContent);
+            }
+
+            // Uložení popisků a dat
+            var rows = tableBody.rows;
+            for (var i = 0; i < rows.length; i++) {
+                labels.push(rows[i].cells[0].querySelector('input').value);
+
+                var rowData = [];
+                var cells = rows[i].cells;
+                for (var j = 1; j < cells.length; j++) {
+                    rowData.push(cells[j].querySelector('input').value);
+                }
+                data.push(rowData);
+            }
+
+            // Uložení do localStorage
+            var savedTable = { headers: headers, labels: labels, data: data };
+            localStorage.setItem('flexibleTable', JSON.stringify(savedTable));
+
+            alert('Tabulka byla uložena.');
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('flexibleTable');
+            alert('Uložená data byla smazána.');
+        }
+    </script>
+</body>
+</html>
