@@ -20,23 +20,6 @@
         }
 
         
-        header {
-            width: 100%;
-            background-color: #003366;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            box-shadow: 0px 3px 3px 3px rgba(0.1, 0.1, 0.1, 0.1);
-        }
-
-        .navbar {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-
         .logo img {
             height: 40px;
         }
@@ -234,22 +217,30 @@
         }
 
         #logout-btn {
-            background-color: #003366;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 0px;
-            position: fixed;
-            bottom: 1200px;
-            right: 20px;
-            z-index: 1000;
-        }
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: fixed;
+    bottom: 96vh; /* Posunutí odspodu na 5% výšky viewportu */
+    right: 1vw; /* Posunutí zprava na 5% šířky viewportu */
+    z-index: 1000;
+}
 
         #logout-btn:hover {
             background-color: #b71c1c; /* Změna barvy při najetí */
+        }
+        #loggedInUser {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 16px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -277,24 +268,15 @@ function logout() {
     </script>
 </head>
 <body>
-    
-    
-                
-            </div>
+     
+</div>
             <div class="datetime">
                 <span id="currentDateTime"></span>
+                
             </div>
-            <button id="logout-btn"onclick="logout()">Odhlásit se</button>
+            
             </div>
-            <div id="user-info">
-                Přihlášený uživatel: <span id="loggedInUser"></span>
-            </div>
-    <!-- Zbytek vašeho HTML kódu -->
-    <script src="main.js"></script>
-   
-    <!-- Zbytek vašeho obsahu -->
-
-    <div class="container">
+            <div class="container">
         <div class="tile" onclick="openPage('money.html')">
             <h2>Pokladna</h2>
             <img src="cash-register-icon.png" alt="Pokladna">
@@ -316,12 +298,13 @@ function logout() {
             <img src="cash-register-icon.png" alt="tabulka">
         </div>
     </div>
-
-    <!-- Button to Add Custom Tile -->
+    <button id="logout-btn"onclick="logout()">Odhlásit se</button>
+    <div id="loggedInUser"></div>
+    <div id="currentDateTime"></div>
     <div class="add-tile-btn" onclick="toggleAddTileForm()">PŘIDAT</div>
 
     <!-- Form to Add Custom Tile (Initially Hidden) -->
-    <div class="add-tile-form" id="addTileForm">
+    <div class="add-tile-form" id="addTileForm" style="display:none;">
         <h2>Vytvořit novou dlaždici</h2>
         <form onsubmit="createCustomTile(); return false;">
             <div class="form-group">
@@ -345,15 +328,40 @@ function logout() {
     </div>
 
     <script>
-        // Načtení uložených dlaždic z localStorage po načtení stránky
+        // Kontrola přihlášení a načítání dlaždic
         window.onload = function() {
+            var loggedIn = localStorage.getItem('loggedIn') === 'true';
+            var currentUser = localStorage.getItem('currentUser');
+
+            if (!loggedIn || !currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Zobrazit přihlášeného uživatele
+            document.getElementById('loggedInUser').textContent = ' ' + currentUser;
+
+            // Načtení uložených dlaždic
             var storedTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
             var tilesContainer = document.getElementById('customTilesContainer');
 
             storedTiles.forEach(function(tile, index) {
                 addCustomTileElement(tile, index);
             });
+
+            // Aktualizace datumu a času každou sekundu
+            setInterval(function() {
+                var now = new Date();
+                var dateTimeString = now.toLocaleDateString('cs-CZ') + ' ' + now.toLocaleTimeString('cs-CZ');
+                document.getElementById('currentDateTime').textContent = dateTimeString;
+            }, 1000);
         };
+
+        function logout() {
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
 
         // Funkce pro otevření/zavření formuláře pro přidání dlaždice
         function toggleAddTileForm() {
@@ -521,13 +529,6 @@ function logout() {
                 return false;
             };
         }
-
-        // Aktuální datum a čas
-        setInterval(function() {
-            var now = new Date();
-            var dateTimeString = now.toLocaleDateString('cs-CZ') + ' ' + now.toLocaleTimeString('cs-CZ');
-            document.getElementById('currentDateTime').textContent = dateTimeString;
-        }, 1000);
         
     </script>
 </body>

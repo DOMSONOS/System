@@ -13,6 +13,8 @@
             height: 100vh;
             background: linear-gradient(to right, #ece9e6, #ffffff);
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .login-container {
@@ -24,9 +26,15 @@
             text-align: center;
         }
 
+        .login-container h1 {
+            color: #003757;
+            margin-bottom: 20px;
+        }
+
         .login-container h2 {
             color: #003757;
             margin-bottom: 20px;
+            font-size: 18px;
         }
 
         .form-group {
@@ -38,14 +46,16 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #555;
         }
 
         .form-group input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
+            box-sizing: border-box; /* To ensure padding is included in width */
         }
 
         .login-btn {
@@ -56,7 +66,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             transition: background-color 0.3s;
         }
 
@@ -73,9 +83,9 @@
 </head>
 <body>
     <div class="login-container">
-        <h1>ŠOUSTÍ APLIKAČKA</h1>
+        <h1>Advance</h1>
         <h2>Přihlášení</h2>
-        <form onsubmit="return validateLogin()">
+        <form id="loginForm" onsubmit="return validateLogin()">
             <div class="form-group">
                 <label for="username">Uživatelské jméno:</label>
                 <input type="text" id="username" required>
@@ -84,11 +94,11 @@
                 <label for="password">Heslo:</label>
                 <input type="password" id="password" required>
             </div>
-            <button type="submit">Přihlásit se</button>
-            <p id="errorMessage" style="color: red; display: none;">Nesprávné uživatelské jméno nebo heslo</p>
+            <button type="submit" class="login-btn">Přihlásit se</button>
+            <p id="errorMessage" class="error-message">Nesprávné uživatelské jméno nebo heslo</p>
         </form>
     </div>
-    <script src="login.js"></script>
+    
 
     <script>
         function validateLogin() {
@@ -117,29 +127,28 @@
         };
         // Uložení uživatelských údajů
 const users = [
-    { username: 'user1', password: 'password1' },
-    { username: 'user2', password: 'password2' },
+    { username: 'SOUŠEK Dominik', password: '455Benecek455' },
+    
     // Přidejte více uživatelů zde
 ];
 
 function validateLogin() {
-    var username = document.getElementById('username').value;
-    var password = document.getElementById('password').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
 
-    // Ověření uživatelského jména a hesla
-    var validUser = users.find(user => user.username === username && user.password === password);
+            // Ověření uživatelského jména a hesla
+            var validUser = users.find(user => user.username === username && user.password === password);
 
-    if (validUser) {
-        localStorage.setItem('loggedIn', 'true');
-        localStorage.setItem('currentUser', username);
-        window.location.href = 'main.html';
-        return false; // Zabraňuje odeslání formuláře
-    } else {
-        document.getElementById('errorMessage').style.display = 'block';
-        return false; // Zabraňuje odeslání formuláře
-    }
-}
-
+            if (validUser) {
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('currentUser', username);
+                window.location.href = 'main.html';
+                return false; // Zabraňuje odeslání formuláře
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                return false; // Zabraňuje odeslání formuláře
+            }
+        }
     </script>
 </body>
 </html>
